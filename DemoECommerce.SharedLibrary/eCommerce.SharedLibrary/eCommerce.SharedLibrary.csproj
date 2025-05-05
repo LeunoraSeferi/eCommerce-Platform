@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Logs\" />
+    <Folder Include="Interface\" />
   </ItemGroup>
 
 </Project>
