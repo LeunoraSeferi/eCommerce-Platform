@@ -1,0 +1,29 @@
+# Ignore build output
+bin/
+obj/
+
+# Ignore Visual Studio temporary files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Ignore Rider and JetBrains IDEs
+.idea/
+
+# Ignore log files
+*.log
+
+# Ignore compiled DLLs and EXEs
+*.dll
+*.exe
+
+# Ignore SQLite DB
+*.sqlite
+
+# Ignore debugging cache
+*.pdb
+
+# Ignore generated folders
+TestResults/
