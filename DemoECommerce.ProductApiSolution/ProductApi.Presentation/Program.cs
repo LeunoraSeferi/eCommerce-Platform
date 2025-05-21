@@ -14,6 +14,13 @@ builder.Services.AddInfrastructureService(builder.Configuration);
 var app = builder.Build();
 
 app.UseInfrastrcturePolicy();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage(); 
+}
+
+
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseHttpsRedirection();

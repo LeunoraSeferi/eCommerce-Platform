@@ -4,6 +4,7 @@ using AuthenticationApi.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using eCommerce.SharedLibrary.Responses;
+using Microsoft.AspNetCore.Authorization;
 
 
 
@@ -11,6 +12,7 @@ namespace AuthenticationApi.Presentation.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [AllowAnonymous]
     public class AuthenticationController : ControllerBase
     {
         private readonly IUser _userInterface;
@@ -53,6 +55,7 @@ namespace AuthenticationApi.Presentation.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [Authorize]
         public async Task<ActionResult<GetUserDTO>> GetUser(int id)
         {
             if (id <= 0)
