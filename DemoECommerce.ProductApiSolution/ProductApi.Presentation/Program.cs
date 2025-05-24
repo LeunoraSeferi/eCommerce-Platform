@@ -1,4 +1,7 @@
+using Microsoft.EntityFrameworkCore;
+using ProductApi.Infrastructure.Data;
 using ProductApi.Infrastructure.DependencyInjection;
+using System.Configuration;
 using System.Globalization;
 
 
@@ -11,6 +14,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddInfrastructureService(builder.Configuration);
+
 var app = builder.Build();
 
 app.UseInfrastrcturePolicy();
