@@ -28,16 +28,18 @@ namespace ProductApi.Application.DTOs.Conversions
                     product!.Id,
                     product.Name!,
                     product.Quantity,
-                    product.Price
+                    product.Price,
+                    product.Image!
                     );
                 return (singleProduct, null);
             }
 
             //return list
             if(products is not null || product is null)
-            { 
+            {
                 var _products = products!.Select(p =>
-                  new ProductDTO(p.Id,p.Name!,p.Quantity,p.Price)).ToList();
+                     new ProductDTO(p.Id, p.Name!, p.Quantity, p.Price, p.Image!)).ToList();
+
 
                 return (null, _products);
 

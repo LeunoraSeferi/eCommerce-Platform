@@ -1,4 +1,5 @@
 ﻿using eCommerce.SharedLibrary.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrderApi.Application.DTOs;
 using OrderApi.Application.DTOs.Conversions;
@@ -10,12 +11,15 @@ namespace OrderApi.Presentation.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class OrdersController(IOrder orderInterface, IOrderService orderService) : ControllerBase
     {
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<OrderDTO>>> GetOrders()
+
         {
+            await Task.Delay(4000);
             var orders = await orderInterface.GetAllAsync();
             if (!orders.Any())
                 return NotFound("No order detected in the database");
@@ -50,11 +54,19 @@ namespace OrderApi.Presentation.Controllers
         [HttpGet("details/{orderId:int}")]
         public async Task<ActionResult<OrderDetailsDTO>> GetOrderDetails(int orderId)
         {
-            if (orderId <= 0) return BadRequest("Invalid data provided");
+            if (orderId <= 0)
+                return BadRequest("Invalid order ID");
 
             var orderDetail = await orderService.GetOrderDetails(orderId);
-            return orderDetail.OrderId > 0 ? Ok(orderDetail) : NotFound("No order found");
+
+            if (orderDetail == null)
+                return NotFound("Order, product, or user not found");
+
+            return Ok(orderDetail);
         }
+
+
+
 
 
         [HttpPost]
@@ -81,7 +93,7 @@ namespace OrderApi.Presentation.Controllers
             return response.Flag ? Ok(response) : BadRequest(response);
         }
 
-
+        
         [HttpDelete]
         public async Task<ActionResult<Response>> DeleteOrder(OrderDTO orderDTO)
         {

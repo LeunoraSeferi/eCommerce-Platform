@@ -1,0 +1,136 @@
+# 🛒 eCommerce Backend – Microservices Architecture (.NET 8)
+
+## 📌 Overview
+
+This project represents the **backend** of a full-stack eCommerce application developed using **ASP.NET Core 8** with a clean **microservices architecture**. The backend is composed of separate services, each responsible for a distinct business capability such as authentication, product management, and order handling. All services communicate via REST APIs and integrate with **SQL Server** using **Entity Framework Core**.
+
+---
+
+## 🧱 Microservices Structure
+/AuthService → Handles user registration, login, JWT authentication
+/ProductService → Manages product catalog (CRUD, listing, filtering)
+/OrderService → Processes user orders and manages order history
+
+
+---
+
+## 🧩 Common Features
+
+ 
+Each microservice is independently deployable, with its own database context, controllers, models, configuration, and startup pipeline.
+
+---
+
+## 🚀 Technologies Used
+
+- ✅ ASP.NET Core 8.0 (Web API)
+- ✅ Entity Framework Core (with SQL Server)
+- ✅ JWT Authentication (with Role-based Authorization)
+- ✅ Swagger (API testing)
+- ✅ xUnit (Unit Testing)
+- ✅ CORS (for frontend integration)
+- ✅ Clean Architecture principles
+
+---
+
+## 📁 Folder Structure (Example per Service)
+
+/Controllers → API endpoints (e.g., AuthController, ProductController)
+/Models → Entity classes (e.g., User, Product, Order)
+/Data → EF Core DbContext and database configuration
+/Repository → Data access layer (interfaces and implementations)
+/Services → Business logic (e.g., token generation, processing orders)
+/Migrations → EF Core migration history
+Program.cs → Application startup and configuration
+appsettings.json → DB connection string and JWT settings
+
+
+
+---
+
+## ⚙️ Setup & Run Instructions
+
+> 🛠 Repeat the steps below for each microservice: **AuthService**, **ProductService**, and **OrderService**.
+
+### ✅ Prerequisites
+
+- Visual Studio 2022+
+- .NET 8 SDK
+- SQL Server (LocalDB or full)
+- EF Core Tools
+
+---
+
+### 🧪 Step-by-Step Guide
+
+1. **Clone the project** and open the microservice folder in Visual Studio.
+
+2. **Configure the database connection** in `appsettings.json`:
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "Server=localhost;Database=YourServiceDb;Trusted_Connection=True;"
+}
+
+3.Run EF Core Migrations:
+Update-Database
+
+4.Start the service:
+dotnet run
+
+5.Open Swagger in your browser:
+https://localhost:[port]/swagger
+
+Each microservice runs on its own port and has its own Swagger documentation.
+🔐 AuthService (Authentication & Authorization)
+
+User registration & login
+
+JWT token generation
+
+Role-based access (Admin, User)
+
+Built using ASP.NET Identity
+
+ProductService (Catalog Management)
+Product listing and filtering
+
+Admin-only product creation, update, delete
+
+Search by name or category
+
+OrderService (Order Processing)
+Place new orders
+
+View past orders by user
+
+Admin control to manage all orders
+
+//Communication & Routing
+AuthService	https://localhost:5001/api/auth
+ProductService	https://localhost:5002/api/products
+OrderService	https://localhost:5003/api/orders
+Use Swagger or Postman to test these endpoints during development.
+
+//Unit Testing
+dotnet test
+
+//CORS Configuration
+Enable CORS in each service to allow communication from the frontend (e.g., React on port 5173):
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy => policy.WithOrigins("http://localhost:5173")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod());
+});
+
+Notes:
+All services are independent and modular
+
+Swagger is available for each API (/swagger)
+
+Frontend communicates directly with each service over HTTP
+
+Admin and User roles can be tested via tokens returned on login
+
+This backend follows modern microservices architecture with clean separation of concerns, scalable service deployment, and secure authentication using JWT. It is designed to be robust, testable, and easily extendable for real-world eCommerce applications.

@@ -6,15 +6,26 @@ using System.Net.Http.Json;
 
 namespace OrderApi.Application.Services
 {
-    public class OrderService(IOrder orderInterface, HttpClient httpClient,
-        ResiliencePipelineProvider<string> resiliencePipeline) : IOrderService
+    public class OrderService : IOrderService
     {
+        private readonly IOrder _orderInterface;
+        private readonly HttpClient _productClient;
+        private readonly HttpClient _authClient;
+        private readonly ResiliencePipelineProvider<string> _resiliencePipeline;
+
+        public OrderService(IOrder orderInterface, IHttpClientFactory httpClientFactory,
+            ResiliencePipelineProvider<string> resiliencePipeline)
+        {
+            _orderInterface = orderInterface;
+            _productClient = httpClientFactory.CreateClient("ProductClient");
+            _authClient = httpClientFactory.CreateClient("AuthClient");
+            _resiliencePipeline = resiliencePipeline;
+        }
+
         // GET PRODUCT
         public async Task<ProductDTO> GetProduct(int productId)
         {
-            // Call Product API using HttpClient
-            // Redirect this call to the API Gateway since product API is not response to outsiders.
-            var getProduct = await httpClient.GetAsync($"/api/products/{productId}");
+            var getProduct = await _productClient.GetAsync($"/api/products/{productId}");
             if (!getProduct.IsSuccessStatusCode)
                 return null!;
 
@@ -22,70 +33,57 @@ namespace OrderApi.Application.Services
             return product!;
         }
 
-
-
         // GET USER
         public async Task<AppUserDTO> GetUser(int userId)
         {
-            // Call Product API using HttpClient
-            // Redirect this call to the API Gateway since product API is not response to outsiders.
-            var getUser = await httpClient.GetAsync($"/api/users/{userId}");
+            var getUser = await _authClient.GetAsync($"/api/authentication/{userId}");
             if (!getUser.IsSuccessStatusCode)
                 return null!;
 
-            var product = await getUser.Content.ReadFromJsonAsync<AppUserDTO>();
-            return product!;
+            var user = await getUser.Content.ReadFromJsonAsync<AppUserDTO>();
+            return user!;
         }
 
-
-        // GET ORDER DETAILS BY ID
-        public async Task<OrderDetailsDTO> GetOrderDetails(int orderId)
+        // GET ORDER DETAILS
+        public async Task<OrderDetailsDTO?> GetOrderDetails(int orderId)
         {
-            // Prepare Order
-            var order = await orderInterface.FindByIdAsync(orderId);
-            if (order is null || order!.Id <= 0)
-                return null!;
+            var order = await _orderInterface.FindByIdAsync(orderId);
+            if (order is null || order.Id <= 0)
+                return null;
 
-            // Get Retry pipeline
-            var retryPipeline = resiliencePipeline.GetPipeline("my-retry-pipeline");
+            var retryPipeline = _resiliencePipeline.GetPipeline("my-retry-pipeline");
 
-            // Prepare Product
             var productDTO = await retryPipeline.ExecuteAsync(async token =>
                 await GetProduct(order.ProductId));
 
-            // Prepare Client
             var appUserDTO = await retryPipeline.ExecuteAsync(async token =>
                 await GetUser(order.ClientId));
 
-            // Populate order Details
+            // Ndërto objektin e plotë
             return new OrderDetailsDTO(
                 order.Id,
-                productDTO.Id,
-                appUserDTO.Id,
-                appUserDTO.Name,
-                appUserDTO.Email,
-                appUserDTO.Address,
-                appUserDTO.TelephoneNumber,
-                productDTO.Name,
+                productDTO?.Id ?? 0,
+                appUserDTO?.Id ?? 0,
+                appUserDTO?.Name ?? "",
+                appUserDTO?.Email ?? "",
+                appUserDTO?.Address ?? "",
+                appUserDTO?.TelephoneNumber ?? "",
+                productDTO?.Name ?? "",
                 order.PurchaseQuantity,
-                productDTO.Price,
-                productDTO.Quantity * order.PurchaseQuantity,
+                productDTO?.Price ?? 0,
+                (productDTO?.Price ?? 0) * order.PurchaseQuantity,
                 order.OrderedDate
             );
         }
 
-
         // GET ORDERS BY CLIENT ID
         public async Task<IEnumerable<OrderDTO>> GetOrdersByClientId(int clientId)
         {
-            // Get all Client's orders
-            var orders = await orderInterface.GetOrdersAsync(o => o.ClientId == clientId);
+            var orders = await _orderInterface.GetOrdersAsync(o => o.ClientId == clientId);
             if (!orders.Any()) return null!;
 
-            // Convert from entity to DTO
             var (_, _orders) = OrderConversion.FromEntity(null, orders);
             return _orders!;
         }
-
     }
 }

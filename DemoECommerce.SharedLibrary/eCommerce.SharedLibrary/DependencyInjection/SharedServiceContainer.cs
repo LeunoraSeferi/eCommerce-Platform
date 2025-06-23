@@ -24,7 +24,7 @@ namespace eCommerce.SharedLibrary.DependencyInjection
                 .MinimumLevel.Information()
                 .WriteTo.Debug()
                 .WriteTo.Console()
-                .WriteTo.File(path: $"{fileName}.txt",
+                .WriteTo.File(path: $"{fileName}-.text",
                  restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information,
                  outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz}] [{Level:u3}] {message:lj}{NewLine}{Exception}",
                  rollingInterval: RollingInterval.Day)
@@ -43,7 +43,7 @@ namespace eCommerce.SharedLibrary.DependencyInjection
             app.UseMiddleware<GlobalException>();
 
             //register middleware to block all outsiders API calls
-            //app.UseMiddleware<ListenToOnlyApiGateway>();
+           // app.UseMiddleware<ListenToOnlyApiGateway>();
 
             return app;
         }

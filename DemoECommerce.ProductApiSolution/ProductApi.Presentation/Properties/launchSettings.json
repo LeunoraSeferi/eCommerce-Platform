@@ -9,7 +9,8 @@
         "DOTNET_SYSTEM_GLOBALIZATION_INVARIANT": "false"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "http://localhost:5001"
+      "applicationUrl": "http://localhost:5003"
+
     },
     "IIS Express": {
       "commandName": "IISExpress",
